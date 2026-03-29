@@ -1,101 +1,107 @@
-# 🏗️ Multi-Agent System Architecture
+# 🏭 High-Fidelity Multi-Agent System Architecture
 
-## 1. Overview
-The **AI News Intelligence Dashboard** is not just a simple news aggregator; it is a structured **multi-agent AI system** designed to transform raw, noisy data into personalized, actionable intelligence. 
-
-By simulating a pipeline of 4 specialized AI agents working sequentially, the system mimics an autonomous research department, moving from data collection to high-level strategic analysis.
-
-### The 4-Agent Pipeline:
-1.  **News Agent**: Data harvesting and cleaning.
-2.  **Analysis Agent**: Trend identification and signal extraction.
-3.  **Personalization Agent**: Contextual adaptation based on user expertise.
-4.  **Video Agent**: Narration and delivery automation.
+## 1. Executive Summary
+The **AI News Intelligence Dashboard** is an end-to-end autonomous system designed to solve the "information overload" problem in financial markets. Unlike traditional chatbots that require a conversational loop, this system follows a **Structured Agency Model**. It utilizes a directed acyclic graph (DAG) of specialized LLM processors that collaborate to transform unstructured news data into strategic intelligence.
 
 ---
 
-## 2. System Architecture
+## 2. Integrated System Architecture
 
 ```mermaid
-flowchart TD
-    User([User Input: Topic + Persona]) --> Dispatcher{Core Dispatcher}
-    
-    subgraph "Multi-Agent Intelligence Pipeline"
-        Dispatcher --> NA[News Agent]
-        NA --> |Raw Articles| AA[Analysis Agent]
-        AA --> |Market Signals| PA[Personalization Agent]
-        PA --> |Tailored Insights| VA[Video Agent]
-        VA --> |Audio Script| Result[Structured JSON Briefing]
-      end
+sequenceDiagram
+    participant U as User (Next.js Frontend)
+    participant D as API Controller (Route.ts)
+    participant NA as News Agent (External API)
+    participant AA as Analysis Agent (LLM)
+    participant PA as Personalization Agent (LLM)
+    participant VA as Video Agent (LLM)
 
-    subgraph "External Integration"
-        NA <--> NAPI[NewsAPI.org]
-        NA -.-> |Fallback| MOCK[Mock Data System]
-        AA & PA & VA <--> GROQ[[Groq LLM: Llama 3.3]]
+    U->>D: POST /api/briefing { topic, persona }
+    D->>NA: fetchNews(topic)
+    alt Live Data Available
+        NA-->>D: Array<Articles>
+    else API Failure / Rate Limit
+        NA-->>D: Array<FallbackMockData>
     end
-
-    Result --> UI[React Dashboard]
-    UI --> TTS[Web Speech API: Audio]
-    UI --> DE[Deep Analysis: Follow-up Agent]
+    
+    note over D,VA: Sequential Prompt Chaining Begins
+    
+    D->>AA: Analyze Raw Articles
+    AA-->>D: Key Signals & Headlines
+    
+    D->>PA: Personalize Findings for Persona
+    PA-->>D: Tailored Insight Blocks
+    
+    D->>VA: Generate Narrative Script
+    VA-->>D: Narration-ready String
+    
+    D-->>U: Final Aggregate JSON { Briefing + Metadata }
+    U->>U: Render Dashboard + Initialize TTS
 ```
 
-### Architectural Principles:
-*   **Sequential Reasoning**: Each agent builds upon the structured output of the previous one, ensuring high-fidelity results.
-*   **Graceful Degradation**: If live data sources fail, the News Agent autonomously switches to high-quality topic-specific mock data.
-*   **Stateless Processing**: The core pipeline is stateless, while the frontend provides memory via `localStorage`.
+---
+
+## 3. Deep-Dive: Agent Specialization & Prompt Engineering
+
+### 🧠 Stage 1: The News Agent (The Harvester)
+The News Agent handles the **Input Sanitization & Data Retrieval** phase.
+*   **Source**: Integrates with [NewsAPI.org](https://newsapi.org/) Everything endpoint.
+*   **Logic**: Uses a 1-hour `revalidate` cache in Next.js to optimize performance and minimize API costs.
+*   **Resilience**: Implements a "Soft Failure" pattern. If the API returns a `429` (Rate limit) or `500`, it switches to a local `mock-data.ts` module that provides curated, high-quality historical context tailored to the user's topic.
+
+### 📊 Stage 2: The Analysis Agent (The Strategist)
+This agent performs **Semantic Distillation**. Its goal is to separate the "signal" from the "noise."
+*   **Prompt Strategy**: Zero-shot Chain of Thought (CoT). It is instructed to look for **causality**—why an event happened—rather than just the event itself.
+*   **Thinking Pattern**:
+    1.  Compare multiple articles for consistency.
+    2.  Identify outliers or unique data points.
+    3.  Distill 5 key highlight points that summarize the "market mood."
+
+### 🎯 Stage 3: The Personalization Agent (The Interpreter)
+The most critical agent for User Experience (UX). It acts as a **Dynamic Content Filter**.
+*   **Conditional Logic**: Injected into the system prompt based on `userType`.
+*   **Target Personas**:
+    *   **Beginners**: Focuses on accessibility. It avoids complex financial jargon (e.g., instead of "Yield Curve Inversion," it explains "Long-term vs Short-term borrowing rates").
+    *   **Investors**: Focuses on alpha. It looks for technical indicators, pricing signals, and macroeconomic correlations.
+
+### 🎥 Stage 4: The Video Agent (The Narrator)
+Generates the final human-centric interface.
+*   **Task**: "Narration Scripting."
+*   **Constraint**: Must be exactly 4-6 lines of text, using prosody-friendly language (easy for Text-to-Speech engines to pronounce naturally).
+*   **Integration**: Feeds directly into the Web Speech API on the frontend.
 
 ---
 
-## 3. Agent Responsibilities
+## 4. Technical Stack & Implementation Details
 
-#### 🧠 News Agent
-*   **Primary Task**: Fetches real-time articles using NewsAPI.
-*   **Resilience logic**: Sanitizes HTML content and handles rate-limiting.
-*   **Recovery**: Automatically triggers a local "Mock Agent" if the API is unavailable or returns 0 results.
-
-#### 📊 Analysis Agent
-*   **Primary Task**: Acts as a senior market analyst.
-*   **Focus**: Filters "noise" to find "signals." It identifies what has changed globally and why it matters to the specific industry.
-*   **Deliverable**: Extracts key headlines and identifies 3-5 critical market movements.
-
-#### 🎯 Personalization Agent
-*   **Primary Task**: Adapts the analysis to the user's specific mental model.
-*   **Logic**: 
-    *   **Beginner**: Simplifies terminology, focuses on "What is this?" and explains general impacts.
-    *   **Investor**: Uses financial nomenclature, focuses on "Alpha" and risk/reward implications.
-
-#### 🎥 Video Agent
-*   **Primary Task**: Acts as a scriptwriter for a "Daily News Briefing" segment.
-*   **Output**: Generates a natural, engaging 4-6 line script used for the system's text-to-speech engine.
+| Layer | Technology | Rationale |
+|---|---|---|
+| **Frontend** | Next.js 15 (App Router) | Server-side rendering for SEO and zero-client-bundle API routes. |
+| **Styling** | Tailwind CSS + Shadcn/ui | Accelerated design system development with premium aesthetics. |
+| **Inference** | [Groq](https://groq.com/) | Near-instant model response times (<500ms) for high-latency tasks. |
+| **Language Model** | Llama 3.3 (70B) | State-of-the-art reasoning for complex analysis and multi-agent simulation. |
+| **AI Orchestration** | [Vercel AI SDK](https://sdk.vercel.ai/) | Standardized interface for AI interactions across different providers. |
 
 ---
 
-## 4. Data Flow
+## 5. Security & Error Handling
 
-1.  **Ingestion**: User enters a topic (e.g., "NVIDIA Earnings") and selects a user type.
-2.  **Harvesting**: The News Agent pulls the 5 most recent relevant articles.
-3.  **Synthesis**: Articles are piped into the Analysis Agent to find the "Story behind the story."
-4.  **Adaptation**: The Personalization Agent rewrites the findings for the target audience.
-5.  **Narration**: The Video Agent creates the script, and the dashboard renders the final interactive briefing.
+### API Resilience
+The system uses a **Circuit Breaker**-inspired pattern for its API routes:
+1.  **Validation**: All incoming requests are validated via **Zod** schema (Topic length, User Persona integrity).
+2.  **Strict JSON Enforcement**: The LLM prompt is engineered to return **raw JSON strings** only. We utilize `ai/JSON.parse` but wrap it in a `try-catch` to handle potential hallucinated characters.
+3.  **Fallback Delivery**: If the entire LLM pipeline fails, the system returns a `500` status with a developer-friendly error message, which is caught by the frontend `toast` system.
 
----
-
-## 5. Key Features
-*   **Multi-agent Simulation**: Demonstrates complex autonomous reasoning workflows.
-*   **Hybrid Data Handling**: Seamlessly blends real-time API data with robust fallback mechanisms.
-*   **Deep Dive Interaction**: The "Explain Deeper" feature allows users to query specific sections for secondary analysis.
-*   **Audio-lite Interaction**: Uses the browser's native Web Speech API to provide an eyes-free briefing.
-*   **Client-side Memory**: Persists previous searches for user convenience without requiring a heavy database.
+### Privacy & Data Safety
+*   **Zero-Persistence**: User searches are only stored in the local `localStorage` of the browser, ensuring user privacy by design.
+*   **Environment Isolation**: Sensitive keys (`GROQ_API_KEY`, `NEWS_API_KEY`) are kept on the server and never exposed to the client-side bundle.
 
 ---
 
-## 6. Tech Stack
-*   **Framework**: Next.js (App Router/TypeScript)
-*   **LLM Provider**: Groq (Llama-3.3-70b-versatile) - Ultra-low latency inference.
-*   **Data Source**: NewsAPI.org
-*   **Voice**: Web Speech API (Native browser implementation)
-*   **Styling**: Tailwind CSS / Radix UI / shadcn-ui
+## 6. Future Roadmap
+*   **Multi-Modal Agents**: Integrating image generation for news-related visuals.
+*   **Vector Search (RAG)**: Using memory buffers to allow agents to "remember" previous news cycles across different sessions.
+*   **Multi-Source News**: Expanding beyond NewsAPI to GDELT or custom web scrapers for deeper coverage.
 
 ---
-
-## 7. Why This Is Unique
-Unlike standard "Chat with News" bots, this project represents a **structured end-to-end pipeline**. It simulates an autonomous system where agents coordinate their specialized skills to deliver a final product (The Briefing). It demonstrates how LLMs can be used not just for conversation, but as **logical controllers** in a complex data processing system.
+*Created for High-Performance AI Hackathon Submission—focusing on Autonomous Systems and Agent Orchestration.*
