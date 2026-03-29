@@ -3,6 +3,8 @@
 ## 1. Executive Summary: The Next-Gen Financial newsroom
 The **Economic Times (ET) AI News Intelligence Dashboard** is a state-of-the-art autonomous system designed to augment financial journalism and investor intelligence. This pilot project demonstrates how a **Structured Agency Model** can solve the "information avalanche" faced by ET's global audience. 
 
+**Live Demo**: [economistintelligencehub.vercel.app](https://economistintelligencehub.vercel.app/)
+
 By leveraging a directed acyclic graph (DAG) of specialized AI agents, the platform transforms high-velocity market data from multiple global sources into the precise, high-utility intelligence expected by a top-tier business daily.
 
 ---

@@ -96,8 +96,8 @@ export default function Home() {
       {/* Header */}
       <div className="border-b border-border bg-card">
         <div className="max-w-5xl mx-auto px-4 py-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">AI News Dashboard</h1>
-          <p className="text-muted-foreground">Get intelligent, personalized news briefings powered by AI agents</p>
+          <h1 className="text-4xl font-bold text-foreground mb-2">Economist Intelligence Hub</h1>
+          <p className="text-muted-foreground">The Economic Times: Multi-agent AI system for real-time financial briefings</p>
         </div>
       </div>
 

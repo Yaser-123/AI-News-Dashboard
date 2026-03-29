@@ -7,8 +7,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'AI News Dashboard',
-  description: 'Multi-agent AI system for intelligent news briefings',
+  title: 'Economist Intelligence Hub | The Economic Times',
+  description: 'AI-driven financial intelligence dashboard powered by a multi-agent system.',
   generator: 'v0.app',
   icons: {
     icon: [

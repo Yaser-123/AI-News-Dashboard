@@ -1,6 +1,8 @@
-# 🗞️ AI News Intelligence Dashboard
+# 🗞️ Economist Intelligence Hub
 
-A professional, high-performance news aggregation and analysis platform powered by **Next.js**, **Groq (Llama 3)**, and **NewsAPI**. This dashboard utilizes a multi-agent AI system to synthesize live news into personalized briefings with deep market insights.
+A professional, high-performance news aggregation and analysis platform powered by **Next.js**, **Groq (Llama 3)**, and **NewsAPI**. This dashboard utilizes a multi-agent AI system to synthesize live financial news into personalized briefings with deep market insights.
+
+**Live Demo**: [economistintelligencehub.vercel.app](https://economistintelligencehub.vercel.app/)
 
 ![Project Preview](https://github.com/Yaser-123/AI-News-Dashboard/blob/main/public/placeholder.jpg?raw=true)
 
