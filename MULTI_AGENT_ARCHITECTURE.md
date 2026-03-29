@@ -1,7 +1,9 @@
-# 🏭 High-Fidelity Multi-Agent System Architecture
+# 🏛️ The Economic Times: High-Fidelity Multi-Agent Intelligence Architecture
 
-## 1. Executive Summary
-The **AI News Intelligence Dashboard** is an end-to-end autonomous system designed to solve the "information overload" problem in financial markets. Unlike traditional chatbots that require a conversational loop, this system follows a **Structured Agency Model**. It utilizes a directed acyclic graph (DAG) of specialized LLM processors that collaborate to transform unstructured news data into strategic intelligence.
+## 1. Executive Summary: The Next-Gen Financial newsroom
+The **Economic Times (ET) AI News Intelligence Dashboard** is a state-of-the-art autonomous system designed to augment financial journalism and investor intelligence. This pilot project demonstrates how a **Structured Agency Model** can solve the "information avalanche" faced by ET's global audience. 
+
+By leveraging a directed acyclic graph (DAG) of specialized AI agents, the platform transforms high-velocity market data from multiple global sources into the precise, high-utility intelligence expected by a top-tier business daily.
 
 ---
 
@@ -11,97 +13,84 @@ The **AI News Intelligence Dashboard** is an end-to-end autonomous system design
 sequenceDiagram
     participant U as User (Next.js Frontend)
     participant D as API Controller (Route.ts)
-    participant NA as News Agent (External API)
-    participant AA as Analysis Agent (LLM)
-    participant PA as Personalization Agent (LLM)
-    participant VA as Video Agent (LLM)
+    participant NA as News Agent (ET Market Data)
+    participant AA as Analysis Agent (Macro Intelligence)
+    participant PA as Personalization Agent (Investor/Pro Persona)
+    participant VA as Video Agent (ET Newscast)
 
     U->>D: POST /api/briefing { topic, persona }
     D->>NA: fetchNews(topic)
-    alt Live Data Available
-        NA-->>D: Array<Articles>
-    else API Failure / Rate Limit
-        NA-->>D: Array<FallbackMockData>
+    alt Live Market Data Available
+        NA-->>D: Array<FinancialArticles>
+    else API Failure / Maintenance
+        NA-->>D: Array<ET_Standard_Fallback_Data>
     end
     
     note over D,VA: Sequential Prompt Chaining Begins
     
-    D->>AA: Analyze Raw Articles
-    AA-->>D: Key Signals & Headlines
+    D->>AA: Analyze Raw Financial Data
+    AA-->>D: Market Signals & Macro Trends
     
-    D->>PA: Personalize Findings for Persona
-    PA-->>D: Tailored Insight Blocks
+    D->>PA: Tailor Intelligence for ET Audience
+    PA-->>D: Persona-Specific Insight Blocks
     
-    D->>VA: Generate Narrative Script
+    D->>VA: Script Daily Briefing Narration
     VA-->>D: Narration-ready String
     
-    D-->>U: Final Aggregate JSON { Briefing + Metadata }
-    U->>U: Render Dashboard + Initialize TTS
+    D-->>U: Final Aggregate JSON { Professional Briefing }
+    U->>U: Render Dashboard + Initialize TTS Briefing
 ```
 
 ---
 
-## 3. Deep-Dive: Agent Specialization & Prompt Engineering
+## 3. Deep-Dive: Financial Agent Specialization
 
-### 🧠 Stage 1: The News Agent (The Harvester)
-The News Agent handles the **Input Sanitization & Data Retrieval** phase.
-*   **Source**: Integrates with [NewsAPI.org](https://newsapi.org/) Everything endpoint.
-*   **Logic**: Uses a 1-hour `revalidate` cache in Next.js to optimize performance and minimize API costs.
-*   **Resilience**: Implements a "Soft Failure" pattern. If the API returns a `429` (Rate limit) or `500`, it switches to a local `mock-data.ts` module that provides curated, high-quality historical context tailored to the user's topic.
+### 🧠 Stage 1: The News Harvester (ET Market Interface)
+The Harvester is designed to handle **High-Velocity Financial Data**.
+*   **Source**: Automated retrieval from global business sources via NewsAPI.
+*   **Resilience**: Uses a **Soft Failure** pattern. If the live feed is unavailable, it switches to a curated `ET Insights` module containing high-quality, pre-vetted historical context to ensure a continuous "Always Live" user experience.
 
-### 📊 Stage 2: The Analysis Agent (The Strategist)
-This agent performs **Semantic Distillation**. Its goal is to separate the "signal" from the "noise."
-*   **Prompt Strategy**: Zero-shot Chain of Thought (CoT). It is instructed to look for **causality**—why an event happened—rather than just the event itself.
-*   **Thinking Pattern**:
-    1.  Compare multiple articles for consistency.
-    2.  Identify outliers or unique data points.
-    3.  Distill 5 key highlight points that summarize the "market mood."
+### 📊 Stage 2: The Macro Analysis Agent (The ET Strategist)
+Acts as a virtual senior editor for *The Economic Times*. 
+*   **Prompt Strategy**: **Zero-shot Chain of Thought (CoT)** centered on "Alpha Generation." It filters noise to find underlying **causality** (e.g., how a 10bps move in Treasury yields impacts the specific searched topic).
+*   **Output Focus**: Identifies 5 critical "Market Signals" that summarize the current sentiment of the search topic.
 
-### 🎯 Stage 3: The Personalization Agent (The Interpreter)
-The most critical agent for User Experience (UX). It acts as a **Dynamic Content Filter**.
-*   **Conditional Logic**: Injected into the system prompt based on `userType`.
-*   **Target Personas**:
-    *   **Beginners**: Focuses on accessibility. It avoids complex financial jargon (e.g., instead of "Yield Curve Inversion," it explains "Long-term vs Short-term borrowing rates").
-    *   **Investors**: Focuses on alpha. It looks for technical indicators, pricing signals, and macroeconomic correlations.
+### 🎯 Stage 3: The Persona Personalization Agent (ET Audience Tiering)
+Adapts the output for the two core pillars of ET's readership:
+*   **Beginner (Market Novices)**: Focuses on **Financial Literacy**. Simplifies terms like "EBITDA" or "Liquidity" while maintaining the ET authoritative tone.
+*   **Investor (Pro/C-Suite)**: Focuses on **Macro Resilience**. Assumes high financial literacy and look for technical correlations, volatility signals, and risk indicators.
 
-### 🎥 Stage 4: The Video Agent (The Narrator)
-Generates the final human-centric interface.
-*   **Task**: "Narration Scripting."
-*   **Constraint**: Must be exactly 4-6 lines of text, using prosody-friendly language (easy for Text-to-Speech engines to pronounce naturally).
-*   **Integration**: Feeds directly into the Web Speech API on the frontend.
+### 🎥 Stage 4: The ET Newscast Agent (The Narrator)
+Automates the creation of a "Daily News Briefing" script.
+*   **Constraint**: Optimized for **Professionalism and Brevity**. The 4-6 line script is designed for the browser’s Web Speech API, creating an "Eyes-Free" financial update experience.
 
 ---
 
-## 4. Technical Stack & Implementation Details
+## 4. Technical Stack & Business Resilience
 
-| Layer | Technology | Rationale |
+| Layer | Technology | Business Rationale |
 |---|---|---|
-| **Frontend** | Next.js 15 (App Router) | Server-side rendering for SEO and zero-client-bundle API routes. |
-| **Styling** | Tailwind CSS + Shadcn/ui | Accelerated design system development with premium aesthetics. |
-| **Inference** | [Groq](https://groq.com/) | Near-instant model response times (<500ms) for high-latency tasks. |
-| **Language Model** | Llama 3.3 (70B) | State-of-the-art reasoning for complex analysis and multi-agent simulation. |
-| **AI Orchestration** | [Vercel AI SDK](https://sdk.vercel.ai/) | Standardized interface for AI interactions across different providers. |
+| **Frontend** | Next.js 15 (App Router) | High-speed delivery and SEO-friendly dynamic market pages. |
+| **Inference** | [Groq](https://groq.com/) | Real-time market analysis depends on sub-500ms latency. |
+| **Language Model** | Llama 3.3 (70B) | High reasoning capability for nuanced sentiment analysis. |
+| **Styling** | Tailwind + Shadcn/ui | Clean, minimal, data-first "ET Business Dark" interface. |
+| **Memory** | Client-side (localStorage) | User privacy by design for high-profile business searches. |
 
 ---
 
-## 5. Security & Error Handling
+## 5. Security & Precision Controls
 
-### API Resilience
-The system uses a **Circuit Breaker**-inspired pattern for its API routes:
-1.  **Validation**: All incoming requests are validated via **Zod** schema (Topic length, User Persona integrity).
-2.  **Strict JSON Enforcement**: The LLM prompt is engineered to return **raw JSON strings** only. We utilize `ai/JSON.parse` but wrap it in a `try-catch` to handle potential hallucinated characters.
-3.  **Fallback Delivery**: If the entire LLM pipeline fails, the system returns a `500` status with a developer-friendly error message, which is caught by the frontend `toast` system.
-
-### Privacy & Data Safety
-*   **Zero-Persistence**: User searches are only stored in the local `localStorage` of the browser, ensuring user privacy by design.
-*   **Environment Isolation**: Sensitive keys (`GROQ_API_KEY`, `NEWS_API_KEY`) are kept on the server and never exposed to the client-side bundle.
+### Data Integrity & Validation
+*   **Signal-to-Noise Filtering**: The LLM prompt is engineered to reject biased or sensationalist headlines, adhering to **Editorial Standards**.
+*   **Error Mitigation**: All incoming requests are validated via **Zod** schema (preventing prompt injections and ensuring payload integrity).
+*   **Circuit-Breaker Logic**: Gracefully degrades to "Deep Insights Mode" if external data providers are unavailable.
 
 ---
 
-## 6. Future Roadmap
-*   **Multi-Modal Agents**: Integrating image generation for news-related visuals.
-*   **Vector Search (RAG)**: Using memory buffers to allow agents to "remember" previous news cycles across different sessions.
-*   **Multi-Source News**: Expanding beyond NewsAPI to GDELT or custom web scrapers for deeper coverage.
+## 6. Strategic Advantage for Economic Times
+*   **Not a Chatbot**: This is a **Directed AI Pipeline**. It provides structured, consistent briefings every time, unlike the unpredictable nature of generic LLM chats.
+*   **AI-Assisted Journalism**: Demonstrates how a newsroom can use agents to quickly summarize global perspectives into a first-draft briefing for editors.
+*   **Personalization at Scale**: Allows ET to serve both retail readers and professional institutions from a single, intelligent backend.
 
 ---
-*Created for High-Performance AI Hackathon Submission—focusing on Autonomous Systems and Agent Orchestration.*
+*Developed for The Economic Times Multi-Agent Intelligence Initiative.*
